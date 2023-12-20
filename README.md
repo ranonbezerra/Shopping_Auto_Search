@@ -1,5 +1,5 @@
 # Shopping_Auto_Search
- An RPA to search for products in a list from a spreadsheet.
+ An RPA to search for products in a list from a spreadsheet using Selenium in Google Chrome.
  
  - This automation gets products names, price range, forbidden websites and words from a xlsx file to export another file with the same extention with the results title, price and link;
  - The version here search exclusively on Google Shopping;
