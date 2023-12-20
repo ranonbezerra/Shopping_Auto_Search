@@ -1,8 +1,4 @@
-from selenium import webdriver
-import pandas as pd
-from funcoes_auxiliares_google import *
-from funcoes_auxiliares_buscape import *
-from search_tools import open_window, ProductSearch
+from search_tools import ProductSearch
 
 def execute_product_research():
 

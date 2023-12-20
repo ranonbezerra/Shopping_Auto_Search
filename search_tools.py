@@ -9,15 +9,15 @@ import re
 class ProductSearch():
         
     def __init__(self, db_filename):
-        self.db = pd.read_excel(db_filename)
-        self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/',
-                                     'BuscaPe': 'https://www.buscape.com.br/'}
+        self.xlsx_database = pd.read_excel(db_filename)
+        self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/'}
+        
 
     def google_shopping_search(self):
 
         self.open_window()
 
-        for product in self.db['Name']:
+        for product in self.xlsx_database['Name']:
 
             self.open_search_website('Google_Shopping')
             self.search_product(product)
@@ -57,6 +57,13 @@ class ProductSearch():
             if 'Shopping' in button.text:
                 button.click()
         sleep(4)
+
+    def get_results(self, product):
+
+        sponsored_results = self.sponsored_results(product)
+        other_matches = self.other_matches(product)
+
+        
 
     def sponsored_results(self, product):
         ''' Obtém os dados da lista dos Resultados Patrocinados do Google Shopping
@@ -124,10 +131,10 @@ class ProductSearch():
             preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
         '''
             
-        banned_words = self.db['Banned Words'][self.db['Name'] == product].values[0]
-        min_price = self.db['Min Value'][self.db['Name'] == product].values[0]
-        max_price = self.db['Max Value'][self.db['Name'] == product].values[0]
-        banned_websites = self.db['Banned Websites'][self.db['Name'] == product].values[0]
+        banned_words = self.xlsx_database['Banned Words'][self.xlsx_database['Name'] == product].values[0]
+        min_price = self.xlsx_database['Min Value'][self.xlsx_database['Name'] == product].values[0]
+        max_price = self.xlsx_database['Max Value'][self.xlsx_database['Name'] == product].values[0]
+        banned_websites = self.xlsx_database['Banned Websites'][self.xlsx_database['Name'] == product].values[0]
 
         product = product.lower()
         product_words_list = product.split(' ')
@@ -231,7 +238,7 @@ class ProductSearch():
         '''
 
         dict_result = {'Product Name': [],'Price': [],'Link': []}
-        product_words_list, banned_words_list, min_value, max_value, banned_websites_titles = self.product_information(product,self.db)
+        product_words_list, banned_words_list, min_value, max_value, banned_websites_titles = self.product_information(product,self.xlsx_database)
         
         results  = self.chrome_window.find_elements('class name','i0X6df')
         
