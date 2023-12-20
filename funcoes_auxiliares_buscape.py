@@ -66,7 +66,7 @@ def resultados_buscape(janela, prod, db):
                    'Preço':           [],
                    'Link':            []}
     
-    lista_prod, lista_ban, preco_min, preco_max, sites_ban = informacoes_produto(prod,db)
+    lista_prod, lista_ban, preco_min, preco_max, sites_ban = product_information(prod,db)
 
     resultados = janela.find_elements('class name','ProductCard_ProductCard_Inner__tsD4M')  
     
@@ -77,10 +77,10 @@ def resultados_buscape(janela, prod, db):
         nome        = nome.lower()
     
         #Se possuir todas palavras chaves e nenhuma banida, executa código
-        if checklist_ban_prod(lista_ban, lista_prod, nome):
+        if check_banned_words(lista_ban, lista_prod, nome):
             #Preço do anúncio
             preco = resultado.find_element('class name','Text_MobileHeadingS__Zxam2').text
-            preco = trata_preco(preco)
+            preco = self.treat_price(preco)
             
             if preco_min <= preco <= preco_max:
                 #Link do anúncio

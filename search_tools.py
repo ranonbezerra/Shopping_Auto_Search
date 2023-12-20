@@ -3,8 +3,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import pandas as pd
 from time import sleep
-from funcoes_auxiliares_geral import *
 import pprint
+import re
 
 class ProductSearch():
         
@@ -21,12 +21,11 @@ class ProductSearch():
 
             self.open_search_website('Google_Shopping')
             self.search_product(product)
-            self.click_shopping_page()
+            self.access_shopping_page()
             self.sponsored_results(product)
+            self.other_matches(product)
 
     #     with pd.ExcelWriter("Results_Google_Shopping.xlsx",engine='xlsxwriter') as google_shopping_file:
-
-        
 
     #             busca_google_shopping(window,product)
 
@@ -51,7 +50,7 @@ class ProductSearch():
         self.chrome_window.find_element('xpath','/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea').send_keys(product, Keys.ENTER)
         sleep(2)
 
-    def click_shopping_page(self):
+    def access_shopping_page(self):
         buttons_list = self.chrome_window.find_elements(By.LINK_TEXT,'Shopping')
 
         for button in buttons_list:
@@ -77,49 +76,196 @@ class ProductSearch():
             Dicionário gerado a partir dos dados obtidos
         '''
 
-        dict_result = {'Nome do Produto': [],
-                       'Preço':           [],
-                       'Link':            []}
+        dict_result = {'Product Name': [],'Price': [],'Link': []}
         
-        lista_prod, lista_ban, preco_min, preco_max, sites_ban = informacoes_produto(product,self.db)
+        product_words_list, banned_words_list, min_value, max_value, banned_websites_titles = self.product_information(product)
 
-        resultados  = self.chrome_window.find_elements('class name','KZmu8e')
+        results  = self.chrome_window.find_elements('class name','KZmu8e')
         
-        for resultado in resultados:
+        for result in results:
         
             #nome do anúncio
-            nome_ref    = resultado.find_element('class name','ljqwrc')
-            nome_filho  = nome_ref.find_element('tag name','h3')
-            nome        = nome_filho.text
-            nome        = nome.lower()
+            name_reference    = result.find_element('class name','ljqwrc')
+            name_childern  = name_reference.find_element('tag name','h3')
+            name        = name_childern.text
+            name        = name.lower()
         
             #Se possuir todas palavras chaves e nenhuma banida, executa código
-            if checklist_ban_prod(lista_ban, lista_prod, nome):
+            if self.check_product_words(banned_words_list, product_words_list, name):
                 #Preço do anúncio
-                preco = resultado.find_element('class name','T14wmb').find_element('tag name','b').text
-                preco = trata_preco(preco)
+                price = result.find_element('class name','T14wmb').find_element('tag name','b').text
+                price = self.treat_price(price)
         
-                if preco_min <= preco <= preco_max:
+                if min_value <= price <= max_value:
                     #Link do anúncio
-                    link_ref  = resultado.find_element('class name','ROMz4c')
-                    link_pai  = link_ref.find_element('xpath','..')
-                    link = link_pai.get_attribute('href')
+                    link_reference  = result.find_element('class name','ROMz4c')
+                    link_parent  = link_reference.find_element('xpath','..')
+                    link = link_parent.get_attribute('href')
 
-                    if not checklist_sites_ban(sites_ban, link):
-                        dict_result['Nome do Produto'].append(nome)
-                        dict_result['Preço'].append(preco)
+                    if not self.check_banned_websites(banned_websites_titles, link):
+                        dict_result['Product Name'].append(name)
+                        dict_result['Price'].append(price)
                         dict_result['Link'].append(link)
         
         pprint.pprint(dict_result)
+
+    def product_information(self, product):
+        '''Retorna informações tratadas do produto advindas de Banco de Dados 
+
+        Parameters
+        ----------
+        produto : list
+            Nome do produto no banco de dados.
+        
+        Returns
+        -------
+        Tuple
+            Tupla com lista de cada string já tratada no nome do produto, lista de strings proibidas no nome do produto,
+            preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
+        '''
+            
+        banned_words = self.db['Banned Words'][self.db['Name'] == product].values[0]
+        min_price = self.db['Min Value'][self.db['Name'] == product].values[0]
+        max_price = self.db['Max Value'][self.db['Name'] == product].values[0]
+        banned_websites = self.db['Banned Websites'][self.db['Name'] == product].values[0]
+
+        product = product.lower()
+        product_words_list = product.split(' ')
+                
+        banned_words = str(banned_words).lower()
+        banned_words_list = banned_words.split(' ')
+
+        banned_websites = str(banned_websites).lower()
+        banned_websites = banned_websites.split(' ')
+
+        return (product_words_list,banned_words_list,min_price,max_price, banned_websites)
+
+    def check_product_words(self, lista_ban, lista_prod, nome):
+        '''Confere se o produto encontrado possui algum item proibitivo ou faltante em sua nomenclatura 
+
+        Parameters
+        ----------
+        lista_ban : list
+            Lista de strings (palavras) proibidas no nome do produto. Lista advinda de base de dados lida previamente.
+        lista_prod : list
+            Lista de strings (palavras) obrigatórias no nome do produto. Lista advinda de base de dados lida previamente.
+        nome : str
+            Nome do produto na listagem do site analisado.
+        
+        Returns
+        -------
+        Boolean
+            True se não encontrar palavras proibidas ou nenhuma das obrigatórias estiver faltando, False caso contrário
+        '''
+
+        possui_ban = False
+        for palavra in lista_ban:
+            if palavra in nome:
+                possui_ban = True
+        
+        possui_prod = True
+        for palavra in lista_prod:
+            if palavra not in nome:
+                possui_prod = False
+
+        return (possui_prod and not possui_ban)
+
+    def check_banned_websites(self, sites_ban, link):
+        '''Confirma se o site não está na lista dos proibidos
+
+        Parameters
+        ----------
+        sites_ban : list
+            Lista de strings (título dos sites) proibidos. Lista advinda de base de dados lida previamente.
+        link : str
+            Link completo do site advindo da pesquisa.
+        
+        Returns
+        -------
+        Boolean
+            True se não encontrar site proibido, False caso contrário
+        '''
+        
+        for site in sites_ban:
+            if site in link:
+                return True
+        
+        return False
+    
+    def treat_price(preco):
+        '''Trata string do preço advinda da pesquisa nos sites 
+
+        Parameters
+        ----------
+        preco : str
+            Preço do produto no formato str.
+        
+        Returns
+        -------
+        Float
+            Valor do preço do produto no formato correto.
+            
+        '''
+
+        preco = preco.replace('R$','').replace(' ','').replace('.','').replace(',','.')
+        preco = re.sub("[^\d\.]", "", preco)
+
+        return float(preco)
+    
+    def other_matches(self, product):
+        ''' Obtém os dados da lista dos Outras Correspondências do Google Shopping
+
+        Parameters
+        ----------
+        janela : WebDriver obj
+            Janela do Google Chrome controlado pelo WebDriver
+        prod : str
+            Dicionário que será pesquisado no site outras_correspondencias
+        db : Pandas DataBase obj
+            Base de dados do Pandas extraída de arquivo base (buscas.xlsx)
+        
+        Returns
+        -------
+        dict
+            Dicionário gerado a partir dos dados obtidos
+        '''
+
+        dict_result = {'Product Name': [],'Price': [],'Link': []}
+        product_words_list, banned_words_list, min_value, max_value, banned_websites_titles = self.product_information(product,self.db)
+        
+        results  = self.chrome_window.find_elements('class name','i0X6df')
+        
+        for result in results:
+        
+            #nome do anúncio
+            name = result.find_element('class name','tAxDx').text
+            name = name.lower()
+        
+            #Se possuir todas palavras chaves e nenhuma banida, executa código
+            if self.check_product_words(banned_words_list, product_words_list, name):
+                #preço do anúncio
+                price = result.find_element('class name','a8Pemb').text
+                price = self.treat_price(price)
+        
+                if min_value <= price <= max_value:
+                    #link do anúncio
+                    link_reference  = result.find_element('class name','bONr3b')
+                    link_parent  = link_reference.find_element('xpath','..')
+                    link = link_parent.get_attribute('href')
+
+                    if not self.check_banned_websites(banned_websites_titles, link):
+                        dict_result['Product Name'].append(name)
+                        dict_result['Price'].append(price)
+                        dict_result['Link'].append(link)
+        
+        return dict_result
+
 
 
 if __name__ == "__main__":
 
     listSearch = ProductSearch('products.xlsx')
     listSearch.google_shopping_search()
-
-    # def search_product(self, window, product):
-    #     window.find_element('xpath','/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea').send_keys(product, Keys.ENTER)
 
     # def busca_google_shopping(window,product):
     #     '''Na janela do Google Chrome, busca em site (http://www.google.com/) de produto específico

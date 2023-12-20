@@ -3,7 +3,7 @@ import re
 import smtplib
 from email.message import EmailMessage
 
-def checklist_ban_prod(lista_ban, lista_prod, nome):
+def check_banned_words(lista_ban, lista_prod, nome):
     '''Confere se o produto encontrado possui algum item proibitivo ou faltante em sua nomenclatura 
 
     Parameters
@@ -55,39 +55,6 @@ def checklist_sites_ban(sites_ban, link):
     
     return False
     
-def informacoes_produto(produto, database):
-    '''Retorna informações tratadas do produto advindas de Banco de Dados 
-
-    Parameters
-    ----------
-    produto : list
-        Nome do produto no banco de dados.
-    database : Pandas DataBase obj
-        Banco de Dados extraído de xlsx.
-    
-    Returns
-    -------
-    Tuple
-        Tupla com lista de cada string já tratada no nome do produto, lista de strings proibidas no nome do produto,
-        preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
-    '''
-        
-    termos_ban = database['Banned Words'][database['Name'] == produto].values[0]
-    preco_min = database['Min Value'][database['Name'] == produto].values[0]
-    preco_max = database['Max Value'][database['Name'] == produto].values[0]
-    sites_ban = database['Banned Websites'][database['Name'] == produto].values[0]
-
-    produto = produto.lower()
-    lista_prod = produto.split(' ')
-            
-    termos_ban = str(termos_ban).lower()
-    lista_ban = termos_ban.split(' ')
-
-    sites_ban = str(sites_ban).lower()
-    sites_ban = sites_ban.split(' ')
-
-    return (lista_prod,lista_ban,preco_min,preco_max, sites_ban)
-    
 def correct_aba_size(aba):
     '''Trata título da aba da planilha do excel gerado
 
@@ -108,7 +75,7 @@ def correct_aba_size(aba):
     else:
          return aba
     
-def trata_preco(preco):
+def treat_price(preco):
     '''Trata string do preço advinda da pesquisa nos sites 
 
     Parameters

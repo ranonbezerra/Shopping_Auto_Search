@@ -8,7 +8,7 @@ def execute_product_research():
 
     # Abrindo navegador e importando dados
     listSearch = ProductSearch('buscas.xlsx')
-    listSearch.search_on_google_shopping(window)
+    listSearch.search_on_google_shopping()
 
 
 #     with pd.ExcelWriter("Results_Google_Shopping.xlsx",engine='xlsxwriter') as google_shopping_file:

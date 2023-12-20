@@ -107,7 +107,7 @@ def resultados_patrocinados(janela, prod, db):
                    'Preço':           [],
                    'Link':            []}
     
-    lista_prod, lista_ban, preco_min, preco_max, sites_ban = informacoes_produto(prod,db)
+    lista_prod, lista_ban, preco_min, preco_max, sites_ban = self.product_information(prod,db)
 
     resultados  = janela.find_elements('class name','KZmu8e')
     
@@ -120,10 +120,10 @@ def resultados_patrocinados(janela, prod, db):
         nome        = nome.lower()
     
         #Se possuir todas palavras chaves e nenhuma banida, executa código
-        if checklist_ban_prod(lista_ban, lista_prod, nome):
+        if check_banned_words(lista_ban, lista_prod, nome):
             #Preço do anúncio
             preco = resultado.find_element('class name','T14wmb').find_element('tag name','b').text
-            preco = trata_preco(preco)
+            preco = self.treat_price(preco)
     
             if preco_min <= preco <= preco_max:
                 #Link do anúncio
@@ -161,7 +161,7 @@ def outras_correspondencias(janela, prod, db):
     dict_result = {'Nome do Produto': [],
                    'Preço':           [],
                    'Link':            []}
-    lista_prod, lista_ban, preco_min, preco_max, sites_ban = informacoes_produto(prod,db)
+    lista_prod, lista_ban, preco_min, preco_max, sites_ban = product_information(prod,db)
     
     resultados  = janela.find_elements('class name','i0X6df')
     
@@ -172,10 +172,10 @@ def outras_correspondencias(janela, prod, db):
         nome = nome.lower()
     
         #Se possuir todas palavras chaves e nenhuma banida, executa código
-        if checklist_ban_prod(lista_ban, lista_prod, nome):
+        if check_banned_words(lista_ban, lista_prod, nome):
             #preço do anúncio
             preco = resultado.find_element('class name','a8Pemb').text
-            preco = trata_preco(preco)
+            preco = self.treat_price(preco)
     
             if preco_min <= preco <= preco_max:
                 #link do anúncio
