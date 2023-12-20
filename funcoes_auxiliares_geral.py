@@ -72,10 +72,10 @@ def informacoes_produto(produto, database):
         preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
     '''
         
-    termos_ban = database['Termos banidos'][database['Nome'] == produto].values[0]
-    preco_min = database['Preço mínimo'][database['Nome'] == produto].values[0]
-    preco_max = database['Preço máximo'][database['Nome'] == produto].values[0]
-    sites_ban = database['Sites Proibidos'][database['Nome'] == produto].values[0]
+    termos_ban = database['Banned Words'][database['Name'] == produto].values[0]
+    preco_min = database['Min Value'][database['Name'] == produto].values[0]
+    preco_max = database['Max Value'][database['Name'] == produto].values[0]
+    sites_ban = database['Banned Websites'][database['Name'] == produto].values[0]
 
     produto = produto.lower()
     lista_prod = produto.split(' ')
