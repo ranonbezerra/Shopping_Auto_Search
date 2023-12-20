@@ -320,36 +320,4 @@ if __name__ == "__main__":
     listSearch = ProductSearch('products.xlsx')
     listSearch.google_shopping_search()
 
-    # def busca_google_shopping(window,product):
-    #     '''Na janela do Google Chrome, busca em site (http://www.google.com/) de produto específico
-    #     e acessar aba de compras (Shopping)
-
-    #     Parameters
-    #     ----------
-    #     janela : WebDriver obj
-    #         Janela do Google Chrome controlado pelo WebDriver
-    #     produto : str
-    #         Produto que será pesquisado no site 
-
-    #     Returns
-    #     -------
-    #         None
-    #     '''
-
-    #     self.open_google_website(window)
-    #     self.search_product(window, product)
-    #     sleep(3)
-    #     try:
-    #         elementos = janela.find_elements('class name','GKS7s')
-    #     except:
-    #         elementos = janela.find_elements('class name','MUFPAc')
-                
-    #     for item in elementos:
-    #         if 'Shopping' == item.text:
-    #             item.click()
-    #             break
-                
-    #     sleep(2)
-          
-
 
