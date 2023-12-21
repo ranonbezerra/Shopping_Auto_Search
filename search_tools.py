@@ -7,8 +7,9 @@ import re
 
 class ProductSearch():
         
-    def __init__(self, db_filename):
-        self.xlsx_database = pd.read_excel(db_filename)
+    def __init__(self, product_list):
+
+        self.database = product_list.self.database
         self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/'}
         self.search_results_filename = 'Search_Results_Google_Shopping.xlsx'
         
@@ -18,7 +19,7 @@ class ProductSearch():
 
         with self.xlsx_writer() as self.search_results_file:
 
-            for product in self.xlsx_database['Name']:
+            for product in self.database['Name']:
 
                 self.product_on_search = product
                 self.open_search_website('Google_Shopping')
@@ -137,10 +138,10 @@ class ProductSearch():
             preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
         '''
             
-        banned_words = self.xlsx_database['Banned Words'][self.xlsx_database['Name'] == self.product_on_search].values[0]
-        min_price = self.xlsx_database['Min Value'][self.xlsx_database['Name'] == self.product_on_search].values[0]
-        max_price = self.xlsx_database['Max Value'][self.xlsx_database['Name'] == self.product_on_search].values[0]
-        banned_websites = self.xlsx_database['Banned Websites'][self.xlsx_database['Name'] == self.product_on_search].values[0]
+        banned_words = self.database['Banned Words'][self.database['Name'] == self.product_on_search].values[0]
+        min_price = self.database['Min Value'][self.database['Name'] == self.product_on_search].values[0]
+        max_price = self.database['Max Value'][self.database['Name'] == self.product_on_search].values[0]
+        banned_websites = self.database['Banned Websites'][self.database['Name'] == self.product_on_search].values[0]
 
         product = self.product_on_search.lower()
         product_words_list = product.split(' ')
