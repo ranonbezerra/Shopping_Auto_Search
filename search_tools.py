@@ -11,7 +11,7 @@ class ProductSearch():
 
         self.database = product_list.self.database
         self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/'}
-        self.search_results_filename = 'Search_Results_Google_Shopping.xlsx'
+        self.search_results_filename = ['Search_Results_Google_Shopping.xlsx']
         
     def google_shopping_search(self):
 
