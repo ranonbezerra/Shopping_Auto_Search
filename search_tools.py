@@ -28,19 +28,6 @@ class ProductSearch():
                 search_results = self.get_search_results()
                 self.generate_dataframe(search_results)
                 self.export_product_sheet()
-
-    #     with pd.ExcelWriter("Results_Google_Shopping.xlsx",engine='xlsxwriter') as google_shopping_file:
-
-    #             busca_google_shopping(window,product)
-
-    #             dict1,dict2 = resultados_google_shopping(window, product, db)
-                
-    #             df_google = dataframe_google_shopping(dict1, dict2)
-
-    #             aba = product + '_Google'
-    #             aba = correct_aba_size(aba)
-
-    #             df_google.to_excel(google_shopping_file, sheet_name=aba, index=False)
                 
     def xlsx_writer(self):
         return pd.ExcelWriter(self.search_results_filename ,engine='xlsxwriter')
@@ -98,25 +85,24 @@ class ProductSearch():
         
         for result in results:
         
-            #nome do anúncio
             name_reference    = result.find_element('class name','ljqwrc')
             name_childern  = name_reference.find_element('tag name','h3')
             name        = name_childern.text
             name        = name.lower()
         
-            #Se possuir todas palavras chaves e nenhuma banida, executa código
             if self.check_product_words(banned_words_list, product_words_list, name):
-                #Preço do anúncio
+                
                 price = result.find_element('class name','T14wmb').find_element('tag name','b').text
                 price = self.treat_price(price)
         
                 if min_value <= price <= max_value:
-                    #Link do anúncio
+                    
                     link_reference  = result.find_element('class name','ROMz4c')
                     link_parent  = link_reference.find_element('xpath','..')
                     link = link_parent.get_attribute('href')
 
                     if not self.check_banned_websites(banned_websites_titles, link):
+
                         dict_returned['Product Name'].append(name)
                         dict_returned['Price'].append(price)
                         dict_returned['Link'].append(link)
@@ -251,18 +237,18 @@ class ProductSearch():
         
         for result in results:
         
-            #nome do anúncio
+            
             name = result.find_element('class name','tAxDx').text
             name = name.lower()
         
-            #Se possuir todas palavras chaves e nenhuma banida, executa código
+            
             if self.check_product_words(banned_words_list, product_words_list, name):
-                #preço do anúncio
+                
                 price = result.find_element('class name','a8Pemb').text
                 price = self.treat_price(price)
         
                 if min_value <= price <= max_value:
-                    #link do anúncio
+                    
                     link_reference  = result.find_element('class name','bONr3b')
                     link_parent  = link_reference.find_element('xpath','..')
                     link = link_parent.get_attribute('href')
