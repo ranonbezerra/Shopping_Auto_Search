@@ -237,11 +237,9 @@ class ProductSearch():
         
         for result in results:
         
-            
             name = result.find_element('class name','tAxDx').text
             name = name.lower()
-        
-            
+    
             if self.check_product_words(banned_words_list, product_words_list, name):
                 
                 price = result.find_element('class name','a8Pemb').text
