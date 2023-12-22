@@ -9,7 +9,7 @@ class ProductSearch():
         
     def __init__(self, product_list):
 
-        self.database = product_list.self.database
+        self.database = product_list.database
         self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/'}
         self.search_results_filename = ['Search_Results_Google_Shopping.xlsx']
         
@@ -193,17 +193,17 @@ class ProductSearch():
         return False
     
     def treat_price(self, price):
-        '''Trata string do preço advinda da pesquisa nos sites 
+        '''Treat the price string obtained from the website 
 
         Parameters
         ----------
-        preco : str
-            Preço do produto no formato str.
+        price : str
+            Product price in string format.
         
         Returns
         -------
         Float
-            Valor do preço do produto no formato correto.
+            Product price in float format.
             
         '''
 
@@ -213,21 +213,16 @@ class ProductSearch():
         return float(price)
     
     def other_matches(self):
-        ''' Obtém os dados da lista dos Outras Correspondências do Google Shopping
+        ''' Obtains the data from the Google Shopping websites classified by it as "Other Correpondencies"
 
         Parameters
         ----------
-        janela : WebDriver obj
-            Janela do Google Chrome controlado pelo WebDriver
-        prod : str
-            Dicionário que será pesquisado no site outras_correspondencias
-        db : Pandas DataBase obj
-            Base de dados do Pandas extraída de arquivo base (buscas.xlsx)
+        None
         
         Returns
         -------
         dict
-            Dicionário gerado a partir dos dados obtidos
+            Dictionry generated with the obtained data
         '''
 
         dict_returned = {'Product Name': [],'Price': [],'Link': []}

@@ -2,7 +2,7 @@ import pandas as pd
 import re
 
 
-class DataManager():
+class ProductList():
 
     def __init__(self, db_filename):
 
@@ -135,19 +135,3 @@ class DataManager():
             final_dataframe[column].extend(dict2[column])
 
         self.product_dataframe = pd.DataFrame.from_dict(final_dataframe).sort_values(by=['Price'])
-
-    def export_product_sheet(self):
-        sheetname = self.set_sheetname()
-        self.product_dataframe.to_excel(self.search_results_file, sheet_name=sheetname, index=False)
-
-    def set_sheetname(self):
-
-        sheetname = self.product_on_search + '_Google'
-        return self.correct_sheetname_size(sheetname)
-
-    def correct_sheetname_size(self, sheetname):
-
-        if len(sheetname) > 31:
-            return sheetname[:31]
-        else:
-            return sheetname
