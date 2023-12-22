@@ -38,17 +38,12 @@ class ProductList():
         banned_websites = str(banned_websites).lower()
         self.banned_websites = banned_websites.split(' ')
 
-    
-    def check_product_words(self, name):
+    def assert_mandatory_words(self, name):
         '''Confere se o produto encontrado possui algum item proibitivo ou faltante em sua nomenclatura 
 
         Parameters
         ----------
-        lista_ban : list
-            Lista de strings (palavras) proibidas no nome do produto. Lista advinda de base de dados lida previamente.
-        lista_prod : list
-            Lista de strings (palavras) obrigatórias no nome do produto. Lista advinda de base de dados lida previamente.
-        nome : str
+        name : str
             Nome do produto na listagem do site analisado.
         
         Returns
@@ -57,22 +52,26 @@ class ProductList():
             True se não encontrar palavras proibidas ou nenhuma das obrigatórias estiver faltando, False caso contrário
         '''
 
-        has_banned_word = False
-        for word in self.banned_words_list:
-            if word in name:
-                has_banned_word = True
-        
+
         has_mandatory_words = True
         for word in self.product_words_list:
             if word not in name:
                 has_mandatory_words = False
 
-        return (has_mandatory_words and not has_banned_word)
+        return has_mandatory_words
+    
+    def assert_no_banned_words(self, name):
+
+        has_no_banned_word = True
+        for word in self.banned_words_list:
+            if word in name:
+                has_no_banned_word = False
+        return has_no_banned_word
     
     def assert_price_in_range(self, price):
         return self.min_value <= price <= self.max_value
 
-    def check_banned_websites(self, link):
+    def assert_no_banned_websites(self, link):
         '''Confirma se o site não está na lista dos proibidos
 
         Parameters
@@ -93,26 +92,6 @@ class ProductList():
                 return True
         
         return False
-    
-    def treat_price(self, price):
-        '''Trata string do preço advinda da pesquisa nos sites 
-
-        Parameters
-        ----------
-        preco : str
-            Preço do produto no formato str.
-        
-        Returns
-        -------
-        Float
-            Valor do preço do produto no formato correto.
-            
-        '''
-
-        price = price.replace('R$','').replace(' ','').replace('.','').replace(',','.')
-        price = re.sub("[^\d\.]", "", price)
-
-        return float(price)
     
     def generate_dataframe(self, search_results):
         '''Realiza construção do DataFrame do Pandas de a partir de dados da busca no Google Shopping
