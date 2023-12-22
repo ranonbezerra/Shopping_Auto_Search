@@ -15,7 +15,7 @@ class ProductSearch():
         self.search_results_filename = ['Search_Results_Google_Shopping.xlsx']
         self.NUMBER_OF_SEARCH_WEBSITES = 1
         
-    def google_shopping_search(self):
+    def shopping_list_search(self):
 
         self.open_window()
 
@@ -252,4 +252,4 @@ if __name__ == "__main__":
 
     product_list   = ProductList('buscas.xlsx')
     product_search = ProductSearch(product_list)
-    product_search.google_shopping_search()
+    product_search.shopping_list_search()
