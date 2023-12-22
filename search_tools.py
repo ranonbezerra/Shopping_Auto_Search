@@ -79,7 +79,6 @@ class ProductSearch():
 
         self.scrapping_location = 'Sponsored Results'
         self.product_list.set_product_information(self.product_on_search)
-
         resulting_webpages  = self.get_resulting_webpages()
         
         for result in resulting_webpages:
@@ -101,10 +100,18 @@ class ProductSearch():
                         return self.set_dataframe_dictionary(product_name, price, link)
                     
     def get_resulting_webpages(self):
-        return self.chrome_window.find_elements('class name','KZmu8e') if self.scrapping_location == 'Sponsored Results' else self.chrome_window.find_elements('class name','i0X6df')
+
+        if self.scrapping_location == 'Sponsored Results':
+            return self.chrome_window.find_elements('class name','KZmu8e')
+        elif self.scrapping_location == 'Other Matches': 
+            return self.chrome_window.find_elements('class name','i0X6df')
 
     def get_name_from_webpage(self, result):
-        return result.find_element('class name','ljqwrc') if self.scrapping_location == 'Sponsored Results' else result.find_element('class name','tAxDx').text
+        
+        if self.scrapping_location == 'Sponsored Results':
+            return result.find_element('class name','ljqwrc')
+        elif self.scrapping_location == 'Other Matches':
+            return result.find_element('class name','tAxDx').text
 
     def treat_name_from_webpage(self, name_on_webpage):
 
@@ -178,10 +185,9 @@ class ProductSearch():
         '''
 
         self.scrapping_location = 'Other Matches'
-        self.product_list.product_information()
         self.product_list.set_product_information(self.product_on_search)
         
-        resulting_webpages  = self.chrome_window.find_elements('class name','i0X6df')
+        resulting_webpages  = self.get_resulting_webpages()
 
         for result in resulting_webpages:
         
@@ -202,18 +208,16 @@ class ProductSearch():
                         return self.set_dataframe_dictionary(product_name, price, link)
 
     def generate_dataframe(self, search_results):
-        '''Realiza construção do DataFrame do Pandas de a partir de dados da busca no Google Shopping
+        '''Build Pandas dataframe from the google shopping search results collected, setting it to a ProductSearch attribute
 
         Parameters
         ----------
-        dict1: dictionary
-            Dicionário gerado a partir da função resultados_patrocinados
-        dict2: dictionary
-            Dicionário gerado a partir da função outras_correspondencias
+        search_results: tuple
+            Tuple with 2 dictionaries generated from the websearch
+            
         Returns
         -------
-        Pandas DataFrame obj
-            DataFrame do Pandas gerado a partir dos dicionários passados como parâmetros concatenados (extendidos)
+        None
         '''
 
         dict1, dict2 = search_results
@@ -238,8 +242,6 @@ class ProductSearch():
     def correct_sheetname_size(self, sheetname):
 
         return sheetname[:31] if len(sheetname) > 31 else sheetname
-            
-
 
 if __name__ == "__main__":
 
