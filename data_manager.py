@@ -87,7 +87,7 @@ class ProductList():
             True se não encontrar site proibido, False caso contrário
         '''
         
-        for site in self.banned_websites_titles:
+        for site in self.banned_websites:
             if site in link:
                 return True
         

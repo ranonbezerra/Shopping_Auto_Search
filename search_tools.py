@@ -98,7 +98,7 @@ class ProductSearch():
                     
                     link  = self.get_link_from_webpage(result)
     
-                    if not self.assert_no_banned_websites(link):
+                    if not self.product_list.assert_no_banned_websites(link):
 
                         return self.set_dataframe_dictionary(product_name, price, link)
                     
