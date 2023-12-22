@@ -52,7 +52,6 @@ class ProductList():
             True se não encontrar palavras proibidas ou nenhuma das obrigatórias estiver faltando, False caso contrário
         '''
 
-
         has_mandatory_words = True
         for word in self.product_words_list:
             if word not in name:
@@ -89,9 +88,9 @@ class ProductList():
         
         for site in self.banned_websites:
             if site in link:
-                return True
+                return False
         
-        return False
+        return True
     
     def generate_dataframe(self, search_results):
         '''Realiza construção do DataFrame do Pandas de a partir de dados da busca no Google Shopping

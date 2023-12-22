@@ -82,50 +82,50 @@ class ProductSearch():
 
         self.scrapping_location = 'Sponsored Results'
         self.product_list.set_product_information(self.product_on_search)
+
         resulting_webpages  = self.get_resulting_webpages()
+        dict_to_return = {'Product Name': [],'Price': [],'Link': []}
         
         for result in resulting_webpages:
-        
             name_on_webpage    = self.get_name_from_webpage(result)
             product_name       = self.treat_name_from_webpage(name_on_webpage)
         
             if self.product_list.assert_mandatory_words(product_name) and self.product_list.assert_no_banned_words(product_name):
-                
                 price_on_webpage = self.get_price_from_webpage(result)
                 price = self.treat_price_from_webpage(price_on_webpage)
         
                 if self.product_list.assert_price_in_range(price):
-                    
-                    link  = self.get_link_from_webpage(result)
+                    link = self.get_link_from_webpage(result)
     
-                    if not self.product_list.assert_no_banned_websites(link):
-
-                        return self.set_dataframe_dictionary(product_name, price, link)
+                    if self.product_list.assert_no_banned_websites(link):
+                        return self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
                     
     def get_resulting_webpages(self):
 
         if self.scrapping_location == 'Sponsored Results':
             return self.chrome_window.find_elements('class name','KZmu8e')
+        
         elif self.scrapping_location == 'Other Matches': 
             return self.chrome_window.find_elements('class name','i0X6df')
 
     def get_name_from_webpage(self, result):
         
         if self.scrapping_location == 'Sponsored Results':
-            return result.find_element('class name','ljqwrc')
+            name_on_webpage = result.find_element('class name','ljqwrc')
+            name_children = name_on_webpage.find_element('tag name','h3')
+            return name_children.text
+        
         elif self.scrapping_location == 'Other Matches':
             return result.find_element('class name','tAxDx').text
 
-    def treat_name_from_webpage(self, name_on_webpage):
-
-        name_childern     = name_on_webpage.find_element('tag name','h3')
-        name              = name_childern.text
+    def treat_name_from_webpage(self, name):
         return name.lower()
 
     def get_price_from_webpage(self, result):
             
         if self.scrapping_location == 'Sponsored Results':
             return result.find_element('class name','T14wmb').find_element('tag name','b').text
+        
         elif self.scrapping_location == 'Other Matches':
             return result.find_element('class name','a8Pemb').text
 
@@ -146,7 +146,6 @@ class ProductSearch():
 
         price = price.replace('R$','').replace(' ','').replace('.','').replace(',','.')
         price = re.sub("[^\d\.]", "", price)
-
         return float(price)
     
     def get_link_from_webpage(self, result):
@@ -163,14 +162,11 @@ class ProductSearch():
             link_parent  = link_reference.find_element('xpath','..')
             return link_parent.get_attribute('href')
 
-    def set_dataframe_dictionary(self, name, price, link):
-
-        dict_to_return = {'Product Name': [],'Price': [],'Link': []}
+    def set_dataframe_dictionary(self, name, price, link, dict_to_return):
 
         dict_to_return['Product Name'].append(name)
         dict_to_return['Price'].append(price)
         dict_to_return['Link'].append(link)
-
         return dict_to_return
 
 
@@ -189,8 +185,9 @@ class ProductSearch():
 
         self.scrapping_location = 'Other Matches'
         self.product_list.set_product_information(self.product_on_search)
-        
+
         resulting_webpages  = self.get_resulting_webpages()
+        dict_to_return = {'Product Name': [],'Price': [],'Link': []}
 
         for result in resulting_webpages:
         
@@ -208,7 +205,7 @@ class ProductSearch():
     
                     if not self.product_list.assert_no_banned_websites(link):
 
-                        return self.set_dataframe_dictionary(product_name, price, link)
+                        return self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
 
     def generate_dataframe(self, search_results):
         '''Build Pandas dataframe from the google shopping search results collected, setting it to a ProductSearch attribute
