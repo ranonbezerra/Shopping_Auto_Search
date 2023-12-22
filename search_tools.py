@@ -94,8 +94,8 @@ class ProductSearch():
         
                 if self.product_list.assert_price_in_range(price):
                     
-                    link_reference  = result.find_element('class name','ROMz4c')
-                    link_parent  = link_reference.find_element('xpath','..')
+                    webpage_link  = result.find_element('class name','ROMz4c')
+                    link_parent  = webpage_link.find_element('xpath','..')
                     link = link_parent.get_attribute('href')
 
                     if not self.assert_no_banned_websites(link):
@@ -119,6 +119,26 @@ class ProductSearch():
     def get_price_from_webpage(self, result):
         return result.find_element('class name','T14wmb').find_element('tag name','b').text
 
+    def treat_price_from_webpage(self, price):
+        '''Treat the price string obtained from the website 
+
+        Parameters
+        ----------
+        price : str
+            Product price in string format.
+        
+        Returns
+        -------
+        Float
+            Product price in float format.
+            
+        '''
+
+        price = price.replace('R$','').replace(' ','').replace('.','').replace(',','.')
+        price = re.sub("[^\d\.]", "", price)
+
+        return float(price)
+
     def assert_no_banned_websites(self, banned_websites_titles, link):
         '''Confirma se o site não está na lista dos proibidos
 
@@ -140,26 +160,7 @@ class ProductSearch():
                 return True
         
         return False
-    
-    def treat_price_from_webpage(self, price):
-        '''Treat the price string obtained from the website 
 
-        Parameters
-        ----------
-        price : str
-            Product price in string format.
-        
-        Returns
-        -------
-        Float
-            Product price in float format.
-            
-        '''
-
-        price = price.replace('R$','').replace(' ','').replace('.','').replace(',','.')
-        price = re.sub("[^\d\.]", "", price)
-
-        return float(price)
     
     def other_matches(self):
         ''' Obtains the data from the Google Shopping websites classified by it as "Other Correpondencies"
