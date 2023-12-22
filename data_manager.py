@@ -69,7 +69,7 @@ class ProductList():
         return has_no_banned_word
     
     def assert_price_in_range(self, price):
-        return self.min_value <= price <= self.max_value
+        return self.min_price <= price <= self.max_price
 
     def assert_no_banned_websites(self, link):
         '''Confirma se o site não está na lista dos proibidos

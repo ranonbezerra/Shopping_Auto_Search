@@ -10,34 +10,37 @@ class ProductSearch():
     def __init__(self, product_list):
 
         self.product_list = product_list
-        self.search_websites_dict = {'Google_Shopping': 'https://www.google.com/'}
+        self.search_websites = ['https://www.google.com/']
         self.search_results_filename = ['Search_Results_Google_Shopping.xlsx']
+        self.NUMBER_OF_SEARCH_WEBSITES = 1
         
     def google_shopping_search(self):
 
         self.open_window()
 
-        with self.xlsx_writer() as self.search_results_file:
+        for search_website_number in range(self.NUMBER_OF_SEARCH_WEBSITES):
 
-            for product in self.product_list.database['Name']:
+            with self.xlsx_writer(search_website_number) as self.search_results_file:
 
-                self.product_on_search = product
-                self.open_search_website('Google_Shopping')
-                self.search_product()
-                self.access_shopping_page()
-                search_results = self.get_search_results()
-                self.generate_dataframe(search_results)
-                self.export_product_sheet()
+                for product in self.product_list.database['Name']:
+
+                    self.product_on_search = product
+                    self.open_search_website(search_website_number)
+                    self.search_product()
+                    self.access_shopping_page()
+                    search_results = self.get_search_results()
+                    self.generate_dataframe(search_results)
+                    self.export_product_sheet()
                 
-    def xlsx_writer(self):
-        return pd.ExcelWriter(self.search_results_filename ,engine='xlsxwriter')
+    def xlsx_writer(self, search_website_number):
+        return pd.ExcelWriter(self.search_results_filename[search_website_number] ,engine='xlsxwriter')
 
     def open_window(self):
         self.chrome_window = webdriver.Chrome()
         self.chrome_window.maximize_window()
 
-    def open_search_website(self, search_website):
-        self.chrome_window.get(self.search_websites_dict[search_website])
+    def open_search_website(self, search_website_number):
+        self.chrome_window.get(self.search_websites[search_website_number])
         sleep(2)
 
     def search_product(self):
