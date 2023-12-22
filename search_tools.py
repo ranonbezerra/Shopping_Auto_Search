@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from data_manager import ProductList
 import pandas as pd
 from time import sleep
 import re
@@ -53,11 +54,12 @@ class ProductSearch():
         for button in buttons_list:
             if 'Shopping' in button.text:
                 button.click()
-        sleep(4)
+        sleep(2)
 
     def get_search_results(self):
 
         sponsored_results = self.get_sponsored_results()
+
         other_matches = self.get_other_matches()
 
         return (sponsored_results, other_matches)
@@ -79,7 +81,7 @@ class ProductSearch():
         dict
             Dicionário gerado a partir dos dados obtidos
         '''
-
+        
         self.scrapping_location = 'Sponsored Results'
         self.product_list.set_product_information(self.product_on_search)
 
@@ -87,6 +89,7 @@ class ProductSearch():
         dict_to_return = {'Product Name': [],'Price': [],'Link': []}
         
         for result in resulting_webpages:
+
             name_on_webpage    = self.get_name_from_webpage(result)
             product_name       = self.treat_name_from_webpage(name_on_webpage)
         
@@ -98,7 +101,8 @@ class ProductSearch():
                     link = self.get_link_from_webpage(result)
     
                     if self.product_list.assert_no_banned_websites(link):
-                        return self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
+                        dataframe_to_return = self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
+        return dataframe_to_return
                     
     def get_resulting_webpages(self):
 
@@ -205,7 +209,8 @@ class ProductSearch():
     
                     if not self.product_list.assert_no_banned_websites(link):
 
-                        return self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
+                        dataframe_to_return =  self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
+        return dataframe_to_return
 
     def generate_dataframe(self, search_results):
         '''Build Pandas dataframe from the google shopping search results collected, setting it to a ProductSearch attribute
@@ -245,10 +250,6 @@ class ProductSearch():
 
 if __name__ == "__main__":
 
-    listSearch = ProductSearch('products.xlsx')
-    listSearch.google_shopping_search()
-
-
-# product_list = ProductList('buscas.xlsx')
-# product_search = ProductSearch(product_list)
-# product_search.google_shopping_search()
+    product_list   = ProductList('buscas.xlsx')
+    product_search = ProductSearch(product_list)
+    product_search.google_shopping_search()
