@@ -8,7 +8,7 @@ class ProductList():
 
         self.database = pd.read_excel(db_filename)
 
-    def product_information(self, product_on_search):
+    def set_product_information(self, product_on_search):
         '''Retorna informações tratadas do produto advindas de Banco de Dados 
 
         Parameters
@@ -23,23 +23,23 @@ class ProductList():
             preço mínimo do produto, preço máximo do propduto e lista de sites proibidos
         '''
             
+        self.min_price = self.database['Min Value'][self.database['Name'] == product_on_search].values[0]
+        self.max_price = self.database['Max Value'][self.database['Name'] == product_on_search].values[0]
+        
         banned_words = self.database['Banned Words'][self.database['Name'] == product_on_search].values[0]
-        min_price = self.database['Min Value'][self.database['Name'] == product_on_search].values[0]
-        max_price = self.database['Max Value'][self.database['Name'] == product_on_search].values[0]
         banned_websites = self.database['Banned Websites'][self.database['Name'] == product_on_search].values[0]
 
         product = product_on_search.lower()
-        product_words_list = product.split(' ')
+        self.product_words_list = product.split(' ')
                 
         banned_words = str(banned_words).lower()
-        banned_words_list = banned_words.split(' ')
+        self.banned_words_list = banned_words.split(' ')
 
         banned_websites = str(banned_websites).lower()
-        banned_websites = banned_websites.split(' ')
+        self.banned_websites = banned_websites.split(' ')
 
-        return (product_words_list,banned_words_list,min_price,max_price, banned_websites)
     
-    def check_product_words(self, banned_words_list, product_words_list, name):
+    def check_product_words(self, name):
         '''Confere se o produto encontrado possui algum item proibitivo ou faltante em sua nomenclatura 
 
         Parameters
@@ -58,18 +58,21 @@ class ProductList():
         '''
 
         has_banned_word = False
-        for word in banned_words_list:
+        for word in self.banned_words_list:
             if word in name:
                 has_banned_word = True
         
         has_mandatory_words = True
-        for word in product_words_list:
+        for word in self.product_words_list:
             if word not in name:
                 has_mandatory_words = False
 
         return (has_mandatory_words and not has_banned_word)
+    
+    def assert_price_in_range(self, price):
+        return self.min_value <= price <= self.max_value
 
-    def check_banned_websites(self, banned_websites_titles, link):
+    def check_banned_websites(self, link):
         '''Confirma se o site não está na lista dos proibidos
 
         Parameters
@@ -85,7 +88,7 @@ class ProductList():
             True se não encontrar site proibido, False caso contrário
         '''
         
-        for site in banned_websites_titles:
+        for site in self.banned_websites_titles:
             if site in link:
                 return True
         

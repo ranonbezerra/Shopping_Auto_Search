@@ -1,7 +1,7 @@
 from search_tools import ProductSearch
+from data_manager import ProductList
 
-def execute_product_research():
+product_list = ProductList('buscas.xlsx')
+product_search = ProductSearch(product_list)
+product_search.google_shopping_search()
 
-    # Abrindo navegador e importando dados
-    product_search = ProductSearch('buscas.xlsx')
-    product_search.google_shopping_search()
