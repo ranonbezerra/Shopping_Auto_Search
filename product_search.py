@@ -5,6 +5,7 @@ from data_manager import ProductList
 import pandas as pd
 from time import sleep
 import re
+from pprint import pprint
 
 class ProductSearch():
         
@@ -82,6 +83,8 @@ class ProductSearch():
             Dicionário gerado a partir dos dados obtidos
         '''
         
+        print('Starting to analyse values on the Sponsored List for {}'.format(self.product_on_search))
+
         self.scrapping_location = 'Sponsored Results'
         self.product_list.set_product_information(self.product_on_search)
 
@@ -102,7 +105,10 @@ class ProductSearch():
     
                     if self.product_list.assert_no_banned_websites(link):
                         dataframe_to_return = self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
-        return dataframe_to_return
+        if 'dataframe_to_return' in locals():
+            print('Got values on the Sponsored List for {}'.format(self.product_on_search))
+            pprint(dict_to_return)
+            return dataframe_to_return
                     
     def get_resulting_webpages(self):
 
@@ -131,7 +137,7 @@ class ProductSearch():
             return result.find_element('class name','T14wmb').find_element('tag name','b').text
         
         elif self.scrapping_location == 'Other Matches':
-            return result.find_element('class name','a8Pemb').text
+            return result.find_element('class name','kHxwFf').text
 
     def treat_price_from_webpage(self, price):
         '''Treat the price string obtained from the website 
@@ -147,7 +153,7 @@ class ProductSearch():
             Product price in float format.
             
         '''
-
+        price = price[:price.find(',')+3]
         price = price.replace('R$','').replace(' ','').replace('.','').replace(',','.')
         price = re.sub("[^\d\.]", "", price)
         return float(price)
@@ -187,6 +193,8 @@ class ProductSearch():
             Dictionry generated with the obtained data
         '''
 
+        print('Starting to analyse values on the Others List for {}'.format(self.product_on_search))
+
         self.scrapping_location = 'Other Matches'
         self.product_list.set_product_information(self.product_on_search)
 
@@ -207,10 +215,12 @@ class ProductSearch():
                     
                     link  = self.get_link_from_webpage(result)
     
-                    if not self.product_list.assert_no_banned_websites(link):
-
+                    if self.product_list.assert_no_banned_websites(link):
                         dataframe_to_return =  self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
-        return dataframe_to_return
+        if 'dataframe_to_return' in locals():
+            print('Got values on the Others List for {}'.format(self.product_on_search))
+            pprint(dict_to_return)
+            return dataframe_to_return
 
     def generate_dataframe(self, search_results):
         '''Build Pandas dataframe from the google shopping search results collected, setting it to a ProductSearch attribute
@@ -224,8 +234,16 @@ class ProductSearch():
         -------
         None
         '''
-
         dict1, dict2 = search_results
+
+        if not dict1:
+            dict1 = {'Product Name': [],
+                        'Price': [],
+                        'Link': []}
+        if not dict2:
+            dict2 = {'Product Name': [],
+                        'Price': [],
+                        'Link': []}
 
         final_dataframe = {}
         columns = ['Product Name','Price','Link']
@@ -250,6 +268,6 @@ class ProductSearch():
 
 if __name__ == "__main__":
 
-    product_list   = ProductList('buscas.xlsx')
+    product_list   = ProductList('products.xlsx')
     product_search = ProductSearch(product_list)
     product_search.shopping_list_search()
