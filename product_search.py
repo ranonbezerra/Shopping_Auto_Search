@@ -107,7 +107,6 @@ class ProductSearch():
                         dataframe_to_return = self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
         if 'dataframe_to_return' in locals():
             print('Got values on the Sponsored List for {}'.format(self.product_on_search))
-            pprint(dict_to_return)
             return dataframe_to_return
                     
     def get_resulting_webpages(self):
@@ -219,7 +218,6 @@ class ProductSearch():
                         dataframe_to_return =  self.set_dataframe_dictionary(product_name, price, link, dict_to_return)
         if 'dataframe_to_return' in locals():
             print('Got values on the Others List for {}'.format(self.product_on_search))
-            pprint(dict_to_return)
             return dataframe_to_return
 
     def generate_dataframe(self, search_results):
